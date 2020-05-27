@@ -4,13 +4,16 @@
 composer = composer
 
 env := dev
-env-flag = --env $(env)
+env-flag = --env "$(env)"
 
 bin = bin
 console = $(bin)/console
 phpunit = $(bin)/phpunit
 
 cache = var/cache/$(env)
+
+filter := ''
+filter-flag = --filter "$(filter)"
 
 .DEFAULT_GOAL := help
 
@@ -128,3 +131,26 @@ migrate: install
 .PHONY: rollup
 rollup: install
 	$(console) doctrine:migrations:migrate prev $(env-flag)
+
+
+## -- Tests --
+
+## Run all tests
+.PHONY: test
+test: install
+	$(phpunit) --testsuite=All $(filter-flag)
+
+## Run application tests
+.PHONY: app-test
+app-test: install
+	$(phpunit) --testsuite=Application $(filter-flag)
+
+## Run domain tests
+.PHONY: domain-test
+domain-test: install
+	$(phpunit) --testsuite=Domain $(filter-flag)
+
+## Run infrastructure tests
+.PHONY: infra-test
+infra-test: install
+	$(phpunit) --testsuite=Infrastructure $(filter-flag)
